@@ -11,7 +11,6 @@ import (
 )
 
 func main() {
-
 	cfg := config.Load()
 
 	loggerLevel := logger.LevelDebug
