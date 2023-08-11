@@ -20,12 +20,13 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	BookService_Create_FullMethodName      = "/book_service.BookService/Create"
-	BookService_GetByID_FullMethodName     = "/book_service.BookService/GetByID"
-	BookService_GetList_FullMethodName     = "/book_service.BookService/GetList"
-	BookService_Update_FullMethodName      = "/book_service.BookService/Update"
-	BookService_UpdatePatch_FullMethodName = "/book_service.BookService/UpdatePatch"
-	BookService_Delete_FullMethodName      = "/book_service.BookService/Delete"
+	BookService_Create_FullMethodName         = "/book_service.BookService/Create"
+	BookService_GetByID_FullMethodName        = "/book_service.BookService/GetByID"
+	BookService_GetList_FullMethodName        = "/book_service.BookService/GetList"
+	BookService_Update_FullMethodName         = "/book_service.BookService/Update"
+	BookService_UpdatePatch_FullMethodName    = "/book_service.BookService/UpdatePatch"
+	BookService_Delete_FullMethodName         = "/book_service.BookService/Delete"
+	BookService_GetBookByTitle_FullMethodName = "/book_service.BookService/GetBookByTitle"
 )
 
 // BookServiceClient is the client API for BookService service.
@@ -38,6 +39,7 @@ type BookServiceClient interface {
 	Update(ctx context.Context, in *UpdateBook, opts ...grpc.CallOption) (*Book, error)
 	UpdatePatch(ctx context.Context, in *UpdatePatchBook, opts ...grpc.CallOption) (*Book, error)
 	Delete(ctx context.Context, in *BookPK, opts ...grpc.CallOption) (*empty.Empty, error)
+	GetBookByTitle(ctx context.Context, in *BookByTitle, opts ...grpc.CallOption) (*Book, error)
 }
 
 type bookServiceClient struct {
@@ -102,6 +104,15 @@ func (c *bookServiceClient) Delete(ctx context.Context, in *BookPK, opts ...grpc
 	return out, nil
 }
 
+func (c *bookServiceClient) GetBookByTitle(ctx context.Context, in *BookByTitle, opts ...grpc.CallOption) (*Book, error) {
+	out := new(Book)
+	err := c.cc.Invoke(ctx, BookService_GetBookByTitle_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BookServiceServer is the server API for BookService service.
 // All implementations must embed UnimplementedBookServiceServer
 // for forward compatibility
@@ -112,6 +123,7 @@ type BookServiceServer interface {
 	Update(context.Context, *UpdateBook) (*Book, error)
 	UpdatePatch(context.Context, *UpdatePatchBook) (*Book, error)
 	Delete(context.Context, *BookPK) (*empty.Empty, error)
+	GetBookByTitle(context.Context, *BookByTitle) (*Book, error)
 	mustEmbedUnimplementedBookServiceServer()
 }
 
@@ -136,6 +148,9 @@ func (UnimplementedBookServiceServer) UpdatePatch(context.Context, *UpdatePatchB
 }
 func (UnimplementedBookServiceServer) Delete(context.Context, *BookPK) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedBookServiceServer) GetBookByTitle(context.Context, *BookByTitle) (*Book, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBookByTitle not implemented")
 }
 func (UnimplementedBookServiceServer) mustEmbedUnimplementedBookServiceServer() {}
 
@@ -258,6 +273,24 @@ func _BookService_Delete_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BookService_GetBookByTitle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BookByTitle)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookServiceServer).GetBookByTitle(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BookService_GetBookByTitle_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookServiceServer).GetBookByTitle(ctx, req.(*BookByTitle))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BookService_ServiceDesc is the grpc.ServiceDesc for BookService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -288,6 +321,10 @@ var BookService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _BookService_Delete_Handler,
+		},
+		{
+			MethodName: "GetBookByTitle",
+			Handler:    _BookService_GetBookByTitle_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

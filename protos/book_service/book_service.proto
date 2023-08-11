@@ -15,5 +15,5 @@ service BookService {
     rpc Update(UpdateBook) returns (Book) {};
     rpc UpdatePatch(UpdatePatchBook) returns (Book) {};
     rpc Delete(BookPK) returns (google.protobuf.Empty) {};
-
+    rpc GetBookByTitle(BookByTitle) returns (Book) {};
 }
