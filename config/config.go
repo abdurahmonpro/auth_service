@@ -38,7 +38,7 @@ type Config struct {
 
 // Load ...
 func Load() Config {
-	if err := godotenv.Load("/ibron_go_user_service.env"); err != nil {
+	if err := godotenv.Load(); err != nil {
 		fmt.Println("No .env file found")
 	}
 
