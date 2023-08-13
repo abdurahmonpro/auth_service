@@ -80,17 +80,12 @@ func (s *UserService) CheckUser(ctx context.Context, req *auth_service.CheckUser
 	}
 
 	user, err := s.strg.User().GetUserByUsername(ctx, req.Name)
-
 	if err != nil {
-		if err.Error() == "no rows in result set" {
-			return &auth_service.CheckUserResponse{}, nil
-		}
-		err := errors.New("invalid username or password")
 		s.log.Error("!!!Login 3--->", logger.Error(err))
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+		return &auth_service.CheckUserResponse{Exists: false, Registered: false}, nil
 	}
 
-	if user.Name == req.Name {
+	if user.Name == req.Name && user.Secret == req.Secret {
 		return &auth_service.CheckUserResponse{Exists: true, Registered: true}, nil
 	}
 
