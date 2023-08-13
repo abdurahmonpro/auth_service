@@ -38,6 +38,7 @@ func (s *authService) Login(ctx context.Context, req *auth_service.LoginRequest)
 	log.Println("Login...")
 
 	errAuth := errors.New("username or password wrong")
+	errNotfound := errors.New("password is wrong")
 
 	user, err := s.strg.User().GetUserByUsername(ctx, req.Name)
 	if err != nil {
@@ -47,7 +48,7 @@ func (s *authService) Login(ctx context.Context, req *auth_service.LoginRequest)
 
 	match, err := security.ComparePassword(user.Secret, req.Secret)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "util.ComparePassword: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "util.ComparePassword: %s", errNotfound.Error())
 	}
 
 	if !match {
@@ -70,15 +71,4 @@ func (s *authService) Login(ctx context.Context, req *auth_service.LoginRequest)
 	}, nil
 }
 
-func (s *authService) Register(ctx context.Context, req *auth_service.CreateUser) (*auth_service.User, error) {
-	s.log.Info("---Register--->", logger.Any("req", req))
 
-	user, err := s.strg.User().GetUserByUsername(ctx, req.Name)
-	if err != nil {
-		log.Println(err.Error())
-		s.log.Error("!!!GetUerByusername--->", logger.Error(err))
-		return nil, err
-	}
-
-	return user, nil
-}
