@@ -105,6 +105,19 @@ func (i *UserService) GetByID(ctx context.Context, req *auth_service.UserPK) (re
 	return
 }
 
+func (i *UserService) GetByName(ctx context.Context, req *auth_service.GetByName) (resp *auth_service.User, err error) {
+
+	i.log.Info("---GetUserByID------>", logger.Any("req", req))
+
+	resp, err = i.strg.User().GetByPKey(ctx, req)
+	if err != nil {
+		i.log.Error("!!!GetUserByID->User->Get--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	return
+}
+
 func (i *UserService) GetList(ctx context.Context, req *auth_service.UserListRequest) (resp *auth_service.UserListResponse, err error) {
 
 	i.log.Info("---GetUsers------>", logger.Any("req", req))
